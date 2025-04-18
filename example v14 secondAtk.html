@@ -298,7 +298,10 @@
         }
 		/* TABS stuff */
 		.tab-container {
-			margin-top: 20px;
+			align-self: stretch;  /* forza questo flex-item a riempire la larghezza del contenitore */
+			width: 100% !important;  /* assicurati che sia 100% del genitore */
+			max-width: none !important;
+			box-sizing: border-box;  /* per includere padding/border nel conteggio larghezza */
 		}
 
 		.tab-buttons {
@@ -340,17 +343,17 @@
 		  margin: 0 auto;
 		}
 
-/* fai occupare TUTTO lo spazio ai pannelli e al chart */
-#mean-container,
-#summary-container,
-#table-container,
-#chartContainer,
-#TABLES,
-#GRAPHS {
-  width: 100% !important;
-  max-width: none;
-  margin: 0 auto;
-}
+		/* fai occupare TUTTO lo spazio ai pannelli e al chart */
+		#mean-container,
+		#summary-container,
+		#table-container,
+		#chartContainer,
+		#TABLES,
+		#GRAPHS {
+		  width: 100% !important;
+		  max-width: none;
+		  margin: 0 auto;
+		}
 
 
 		/* Le tabelle interne possono restare al 100% del loro contenitore */
@@ -363,6 +366,14 @@
 		/* Se usi flex o bootstrap grid, assicurati che non ci siano override */
 		.tab-panel {
 		  box-sizing: border-box;
+		}
+		/* Assicura che il canvas di CanvasJS si allarghi al 100% */
+		#chartContainer,
+		#chartContainer > .canvasjs-chart-container,
+		#chartContainer canvas {
+		  width: 100% !important;
+		  max-width: none !important;
+		  height: 100% !important;
 		}
 		
     </style>
@@ -1570,11 +1581,29 @@ for (let ac of AC) {
 }
 
 
-let container = document.getElementById("chartContainer");
-let chart = new CanvasJS.Chart("chartContainer", {
-    width:  container.offsetWidth,
-    height:  container.offsetHeight,
-    /* …resto delle opzioni… */
+// prima di creare il chart:
+const container = document.getElementById("chartContainer");
+
+// crea il chart senza width/height hard‑coded
+const chart = new CanvasJS.Chart("chartContainer", {
+    // NON mettere qui width: ..., height: ...
+    animationEnabled: true,
+    backgroundColor: "#bfbfbf",
+    title:{ text: `Hitting probability …` },
+    axisX:{ /* … */ },
+    axisY:{ /* … */ },
+    data: [ /* … */ ]
+});
+
+// render iniziale
+chart.render();
+
+// ricalcola e ridisegna al resize
+window.addEventListener("resize", () => {
+  // aggiorniamo dimensioni interne se vuoi:
+  chart.options.width  = container.clientWidth;
+  chart.options.height = container.clientHeight;
+  chart.render();
 });
 
 // Calcola il numero massimo di attacchi per turno per ciascun attacker.
