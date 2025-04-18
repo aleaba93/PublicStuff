@@ -1759,9 +1759,9 @@ function createMeanTable(data) {
     // Si assume che le variabili globali swing1 e bonusAttack1 (o f_PM1) siano definite per attacco1 e
     // analogamente swing2 e bonusAttack2 (o f_PM2) per attacco2.
 	// numero di tiri (hit-roll) PER TURNO
-	const attemptsPerTurnA1 = swing1 + (bonusAttack1 ? 1 : 0);
+	const attemptsPerTurnA1 = swing1 + ((bonusAttack1 || fPM1) ? 1 : 0);
 	const attemptsPerTurnA2 = data[0].Damage2 !== undefined
-	  ? swing2 + (bonusAttack2 ? 1 : 0)
+	  ? swing2 + ((bonusAttack1 || fPM1) ? 1 : 0)
 	  : null;    
 	  
     Object.entries(meanSummary).forEach(([ac, values]) => {
