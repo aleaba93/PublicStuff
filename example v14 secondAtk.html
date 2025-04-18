@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	
+    <!-- INSERT BELOW Favicon in Base64 -->
+
+
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2%;
+            /* background-color: #222; /* Aggiunto per modalità dark predefinita */
+            /* color: #e6e6e6; /* Aggiunto per modalità dark predefinita */
+        }
+
+        img {
+            height: 140px;
+            width: 140px;
+        }
+
+        h1 {
+            color: #32a852;
+            text-align: center;
+        }
+        h2 {
+            color: #32a852;
+            text-align: left;
+			font-style: italic;
+			font-size: 22px;
+        }		
+		h6 {
+            text-align: left;
+			font-style: italic;
+			margin-top: 10px;
+        }	
+		.form-group-center {
+			display: flex;
+			align-items: center;
+		}
+		.bold-margin {
+		  font-weight: bold; /* Make text bold */
+		  margin-top: 25px; /* Add 25px margin-top */
+		}
+		.custom-mt {
+            margin-top: 10px;
+        }
+		.custom-mt-s {
+            margin-top: 4px;
+        }
+		.custom-mt-big {
+            margin-top: 17px;
+			font-weight: bold;
+        }
+		.custom-ml {
+			margin-left: 10px;
+		}
+		.new-line {
+			display: block;
+		}
+		
+		.form-check-inline {
+			display: inline-block;
+			margin-right: 20px; /* Distance between radio */
+			margin-top: -11px; /* Distance above radio */
+		}
+
+		.form-check-group {
+			margin-bottom: 18px; /* Aggiungi spazio sotto il gruppo di radio button */
+		}		
+		
+		/* Stili per modalità dark */
+		body.dark .form-control {
+			background-color: #343a40; /* Colore per modalità dark */
+			color: #ffffff;            /* Colore per modalità dark */
+			border-color: #495057;
+		}
+		
+		.hidden {
+			display: none;
+        }
+
+        .mode {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .change {
+            cursor: pointer;
+            border: 1px solid #555;
+            border-radius: 40%;
+            width: 20px;
+            text-align: center;
+            padding: 5px;
+            margin-left: 8px;
+        }
+
+        .dark {
+            background-color: #222;
+            color: #e6e6e6;
+        }
+		body.dark ::placeholder {
+		  color: #6d757d; /* Light gray for placeholder text on dark mode */
+		}
+		/* ROUND SWITCH 	*/
+        /* Larghezza e altezza contenitore pulsante */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 30px;
+            height: 14px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        /* Switch un-checked color */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: gray;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        /* Switch circle slider color */
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 1px;
+            bottom: 1px;
+            background-color: Black;
+            -webkit-transition: .4s;
+            transition: .1s;
+        }
+        /* Switch checked color */
+        input:checked + .slider {
+            background-color: #304E93;   /* Old blue color: #304E93 */
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 4px #000000;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(16px);
+            -ms-transform: translateX(16px);
+            transform: translateX(16px);
+        }
+        /* ROUNDED SLIDERS */
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
+		.button-checkbox {
+            display: none;
+        }
+		/* COMPARE button */
+        .button-label {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #6c757d;
+            color: white;
+            border: 2px solid #6c757d;
+            border-radius: 5px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .button-checkbox:checked + .button-label {
+            background-color: #007bff;
+            border-color: #007bff;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        .button-checkbox:not(:checked) + .button-label:hover {
+            background-color: #5a6268;
+        }
+		
+		/* DROP DOWN SELECTION */
+		/*the container must be positioned relative:*/
+		.custom-select {
+		  position: relative;
+		  font-family: Arial;
+		}
+		.custom-select select {
+		  display: none; /*hide original SELECT element:*/
+		}
+		.select-selected {
+		  background-color: #6c757d; /* Update background color to match the button */
+		  padding: 7px; /* Space added on left of text */
+		  border: none;
+		  border-radius: 5px; /* Rounded corners */
+		  cursor: pointer;
+		}
+		.select-selected:after {
+		  position: absolute;
+		  content: "";
+		  top: 39px; /* Adjusted top position of the arrow */
+		  right: 15px;
+		  width: 0;
+		  height: 0;
+		  border: 6px solid transparent;
+		  border-color: #fff transparent transparent transparent;
+		  pointer-events: none; /* Ensure it doesn't interfere with the click events */
+		}
+		.select-selected.select-arrow-active:after {
+		  border-color: transparent transparent #fff transparent;
+		  top: 33px; /* Adjusted top position for the arrow pointing upwards */
+		}
+		.select-items div, .select-selected {
+		  padding: 6px 14px; /* First is highness of rectangle Second is padding left of text */
+		  border: 1px solid transparent;
+		  border-color: rgba(0, 0, 0, 0.1); /* button area border color */
+		  cursor: pointer;
+		  user-select: none;
+		}
+		/* Default light mode styles */
+		.select-selected {
+		  background-color: white;
+		  color: black;
+		}
+		.select-selected:after {
+		  border-color: black transparent transparent transparent;
+		}
+		.select-selected.select-arrow-active:after {
+		  border-color: transparent transparent black transparent;
+		}
+		.select-items {
+		  background-color: white;
+		}
+		.select-items div, .select-selected {
+		  color: black;
+		  border-radius: 5px; /* Rounded corners */
+		}
+
+		/* Dark mode styles */
+		body.dark .select-selected {
+		  background-color: #343a40; /* Scroll-down button color */
+		  border-color: rgba(255, 255, 255, 0.1);
+		  color: white;
+		}
+		body.dark .select-selected:after { 
+		  border-color: #fff transparent transparent transparent; /* Arrow color */
+		}
+		body.dark .select-selected.select-arrow-active:after {
+		  border-color: transparent transparent #fff transparent; /* Arrow activated color */
+		}
+		body.dark .select-items {
+		  background-color: #6c757d; /* Pre-selecting scroll-down menu color*/
+		  border-radius: 5px; /* Rounded corners */
+		}
+		body.dark .select-items div, body.dark .select-selected {
+		  color: #ffffff;
+		  border-color: grey dark grey rgba(0, 0, 0, 0.1) darkgrey; 
+		}
+		.select-hide {
+		  display: none;
+		}
+		.select-items div:hover, .same-as-selected {
+		  background-color: rgba(0, 0, 0, 0.1);
+		}
+		body.dark .select-items div:hover, body.dark .same-as-selected {
+		  background-color: #304E93;
+		}
+		/* MINMAX AC dimension */
+		.input-container {
+		  width: 12%;
+		  min-width: 50px; /* Imposta una larghezza minima per evitare troppo restringimento */
+		  max-width: 60px;
+		}
+		
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+		/* TABS stuff */
+		.tab-container {
+			margin-top: 20px;
+		}
+
+		.tab-buttons {
+			display: flex;
+			border-bottom: 2px solid #555;
+		}
+		
+		.tab-btn {
+			background: #333;
+			color: white;
+			border: none;
+			padding: 10px 20px;
+			cursor: pointer;
+			transition: 0.3s;
+		}
+
+		.tab-btn.active {
+			background: #666;
+			font-weight: bold;
+		}
+
+		.tab-panel {
+			display: none;
+			padding: 10px;
+			border: 1px solid #555;
+			background: #222;
+			color: white;
+		}
+
+		.tab-panel.active {
+			display: block;
+		}
+		/* Allinea al centro e imposta larghezza 80% */
+		#mean-container,
+		#summary-container,
+		#table-container,
+		#chartContainer {
+		  width: 80%;
+		  margin: 0 auto;
+		}
+
+/* Riduco TUTTO il pannello delle tabelle all'80% e lo centro */
+#TABLES {
+  width: 80%;
+  margin: 0 auto;
+}
+/* Riduco TUTTO il pannello del grafico all'80% e lo centro */
+#GRAPHS {
+  width: 100%;      /* usa tutta la larghezza disponibile */
+  max-width: 1200px;/* oppure imposti un limite massimo */
+  margin: 0 auto;
+}
+
+
+		/* Le tabelle interne possono restare al 100% del loro contenitore */
+		#mean-container table,
+		#summary-container table,
+		#table-container table {
+		  width: 100%;
+		}
+
+		/* Se usi flex o bootstrap grid, assicurati che non ci siano override */
+		.tab-panel {
+		  box-sizing: border-box;
+		}
+		
+    </style>
+</head>
+
+<body class="dark">
+    <div class="mode">
+        Dark mode:
+        <span class="change">ON</span>
+    </div>
+
+    <script>
+        $(".change").on("click", function () {
+            if ($("body").hasClass("dark")) {
+                $("body").removeClass("dark");
+                $(".change").text("OFF");
+            } else {
+                $("body").addClass("dark");
+                $(".change").text("ON");
+            }
+        });
+    </script>
+	
+	
+    <h1 class="mb-4">BUILD ENGINE</h1>
+	<div style="height: 50px"></div>
+    <h1 class="mb-4">Parameters</h1><!--Attack -->
+    <div class="mb-5"> <!--MARGIN BOTTOM -->
+        <input type="checkbox" class="button-checkbox" id="comparisonModeToggle">
+        <label class="button-label" for="comparisonModeToggle">COMPARISON MODE</label>
+    </div>
+    <div class="container">
+		<form id="meanDmg">
+            <div class="row">
+                <div class="col-md-6">
+                    <fieldset>
+                        <h2 class="hidden" id="FIRST">First Attacker</h2> <!--hidden until the COMPARISON MODE is activated-->
+                        <!--label1-->
+						<div class="form-group">
+							<label for="label1">Label:</label>
+							<input type="text" class="form-control" id="label1" placeholder="Example: Lv6 Crossbow Expert Battlemaster">
+						</div>
+                        <!--swing1-->
+                        <div class="form-group custom-mt">
+                            <label for="swing1">Number of Attacks for One Action:</label>
+                            <input type="number" class="form-control" id="swing1" name="swing1" value="1">
+                        </div>
+                        <!--BonusAttack1-->
+                        <div class="form-group d-flex align-items-center custom-mt">
+                            <label class="switch">
+                                <input type="checkbox" class="form-check-input" id="BonusAttack1" name="BonusAttack1">
+                                <span class="slider round"></span>
+                            </label>
+                            <label class="custom-ml" for="BonusAttack1">Enable Bonus Action Attack</label>
+                        </div>
+                        <!--num1--> 	
+                        <div class="form-group custom-mt">
+                            <label for="num1">Number of Damage Dice:</label>
+                            <input type="number" class="form-control" id="num1" name="num1" value="1">
+                        </div>
+                        <!--val1-->
+						<div class="custom-select custom-mt">
+							<label for="val1">Value of Damage Dice:</label>
+							<select name="val1">
+								<option name="val1_default"  id="val1" value="0">Select dice type</option>
+								<option name="val1_4"  id="val1_4" value="4">d4</option>
+								<option name="val1_6"  id="val1_6" value="6">d6</option>
+								<option name="val1_8"  id="val1_8" value="8">d8</option>
+								<option name="val1_10" id="val1_10" value="10">d10</option>
+								<option name="val1_12" id="val1_12" value="12">d12</option>
+							</select>
+						</div>
+						<!--PB1-->
+						<div class="form-group custom-mt">
+							<label for="PBRadios1">Proficiency bonus:</label>
+						</div>
+						<div class="form-check-group" id="PBRadios1">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBradios1" id="PB1_2" value="2" checked>
+								<label class="form-check-label" for="PB1_2">+2</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBradios1" id="PB1_3" value="3">
+								<label class="form-check-label" for="PB1_3">+3</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBradios1" id="PB1_4" value="4">
+								<label class="form-check-label" for="PB1_4">+4</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBradios1" id="PB1_5" value="5">
+								<label class="form-check-label" for="PB1_5">+5</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBradios1" id="PB1_6" value="6">
+								<label class="form-check-label" for="PB1_6">+6</label>
+							</div>								
+						</div>
+						<!--AM1-->
+						<div class="form-group" style="margin-top: -10px">
+							<label for="AM1">Attribute (or ability) modifier:</label>
+							<input type="number" class="form-control" id="AM1" name="AM1" value="1">
+						</div>							
+						<!--add_am_dmg1-->
+						<div class="form-group d-flex align-items-center" style="margin-top: 15px">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="add_am_dmg1" name="add_am_dmg1" checked>
+								<span class="slider round"></span>
+							</label>
+							<label class="custom-ml" for="add_am_dmg1">Ability Modifier Applies to Damage</label>
+						</div>					
+						<!--Magic Weapon1-->
+						<div class="form-group custom-mt d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="MW1" name="MW1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="MW1">Magic Weapon</label>
+						</div>
+						<div class="form-check-group custom-mt-s hidden" id="magicWeaponRadios1">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="MWradios1" id="MW1_1" value="1">
+								<label class="form-check-label" for="MW1_1">+1</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="MWradios1" id="MW1_2" value="2">
+								<label class="form-check-label" for="MW1_2">+2</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="MWradios1" id="MW1_3" value="3">
+								<label class="form-check-label" for="MW1_3">+3</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="MWradios1" id="MW1_4" value="4">
+								<label class="form-check-label" for="MW1_4">+4</label>
+							</div>							
+						</div>
+						<div class="form-group custom-mt hidden" id="personalCommentA_1">
+                            <label for="MW1_4">For real mate??</label>
+                        </div>						
+						<div class="custom-mt-big">FEAT:</div>
+						<!--f_GWM1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="f_GWM1" name="f_GWM1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="f_GWM1">Great weapon master \ Sharpshooter</label>
+						</div>
+						<!--f_PM1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="f_PM1" name="f_PM1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="f_PM1">Polearm master</label>
+						</div>
+						<div class="custom-mt-big">CLASS FEATURES:</div>
+						<div class="custom-mt-s"><i>Fighting styles</i></div>
+						<!--fs_GWF1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="fs_GWF1" name="fs_GWF1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="fs_GWF1">Great weapon fighter</label>
+						</div>					
+						<!--fs_duelist1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="fs_duelist1" name="fs_duelist1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="fs_duelist1">Duelist fighting style</label>
+						</div>						
+						<!--fs_archer1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="fs_archer1" name="fs_archer1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="fs_archer1">Archer</label>
+						</div>
+						<div class="custom-mt"><i>Fighter</i></div>
+						<!--Champ_f1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="Champ_f1" name="Champ_f1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="Champ_f1">Champion crit improved</label>
+						</div>
+						<div class="custom-mt"><i>Barbarian</i></div>
+						<!--reckless1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="reckless1" name="reckless1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="reckless1">Reckless attack</label>
+						</div>
+						<!--Rage damage1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="rage1" name="rage1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="rage1">Rage damage bonus</label>
+						</div>
+						<div class="form-check-group hidden" id="rageDamageRadios1">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="rageRadios1" id="rage_damage1_2" value="2">
+								<label class="form-check-label" for="rage_damage1_2">+2 damage</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="rageRadios1" id="rage_damage1_3" value="3">
+								<label class="form-check-label" for="rage_damage1_3">+3 damage</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="rageRadios1" id="rage_damage1_4" value="4">
+								<label class="form-check-label" for="rage_damage1_4">+4 damage</label>
+							</div>
+						</div>
+						<!--Rage brutal critical1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="BrutCrit1" name="BrutCrit1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="BrutCrit1">Brutal Critical</label>
+						</div>
+						<div class="form-check-group hidden" id="BrutCritRadios1">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="BC_Radios1" id="BrutCrit1_1" value="1">
+								<label class="form-check-label" for="BrutCrit1_1">+1 dice</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="BC_Radios1" id="BrutCrit1_2" value="2">
+								<label class="form-check-label" for="BrutCrit1_2">+2 dice</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="BC_Radios1" id="BrutCrit1_3" value="3">
+								<label class="form-check-label" for="BrutCrit1_3">+3 dice</label>
+							</div>
+						</div>
+						<div class="custom-mt-big">SPELLS:</div>				
+						<!--BLS1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="BLS1" name="BLS1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="BLS1">Bless</label>
+						</div>  						
+						<!--add_dmg1-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="add_dmg1" name="add_dmg1">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="add_dmg1">On hit additional damage</label>
+						</div>
+						<!--AdditionalDamage1-->
+						<div class="form-group custom-mt-s hidden" id="additionalDamageSection1" >
+						<!--add_dmg_num1-->
+							<label for="add_dmg_num1">Number of Additional Damage Dice:</label>
+							<input type="number" class="form-control" id="add_dmg_num1" name="add_dmg_num1" value="0">
+						<!--add_dmg_val1-->
+							<div class="custom-select custom-mt">
+							<label for="add_dmg_val1">Type of Additional Damage Dice:</label>
+							<select id="add_dmg_val1">
+								<option value="0">Select dice type</option>
+								<option id="add_dmg_val1_4"  value="4">d4</option>
+								<option id="add_dmg_val1_6"  value="6">d6</option>
+								<option id="add_dmg_val1_8"  value="8">d8</option>
+								<option id="add_dmg_val1_10" value="10">d10</option>
+								<option id="add_dmg_val1_12" value="12">d12</option>
+							</select>
+							</div>
+						</div>
+	<!---------------------------- Aggiungi altri campi qui --------------------------------------------------------------------------------------------------------->	
+						</fieldset>
+					</div>
+					
+					<div class="col-md-6 hidden" id="SECOND">
+						<fieldset>
+						<h2>Second Attacker</h2>
+						<div class="form-group">
+							<label for="label2">Label:</label>
+							<input type="text" class="form-control" id="label2" placeholder="Example: Lv5 Monk + 1LvWarlock (hex)">
+						</div>
+						<!--swing2-->
+						<div class="form-group custom-mt">
+							<label for="swing2">Number of Attacks for One Action:</label>
+							<input type="number" class="form-control" id="swing2" name="swing2" value="1">
+						</div>
+						<div class="form-group custom-mt d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="BonusAttack2" name="BonusAttack2" >
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="BonusAttack2">Enable Bonus Action Attack</label>
+						</div>
+						<div class="form-group custom-mt">
+							<label for="num2">Number of Dice:</label>
+							<input type="number" class="form-control" id="num2" name="num2" value="1">
+						</div>
+						<!--Val2-->
+						<div class="custom-select custom-mt">
+							<label for="val2">Value of Damage Dice:</label>
+							<select name="val2">
+								<option name="val2_default"  id="val2" value="0">Select dice type</option>
+								<option name="val2_4"  id="val2_4" value="4">d4</option>
+								<option name="val2_6"  id="val2_6" value="6">d6</option>
+								<option name="val2_8"  id="val2_8" value="8">d8</option>
+								<option name="val2_10" id="val2_10" value="10">d10</option>
+								<option name="val2_12" id="val2_12" value="12">d12</option>
+							</select>
+						</div>
+						<!--PB2-->
+						<div class="form-group custom-mt">
+							<label for="PBRadios2">Proficiency bonus:</label>
+						</div>
+						<div class="form-check-group" id="PBRadios2">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBRadios2" id="PB2_2" value="2" checked>
+								<label class="form-check-label" for="PB2_2">+2</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBRadios2" id="PB2_3" value="3">
+								<label class="form-check-label" for="PB2_3">+3</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBRadios2" id="PB2_4" value="4">
+								<label class="form-check-label" for="PB2_4">+4</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBRadios2" id="PB2_5" value="5">
+								<label class="form-check-label" for="PB2_5">+5</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="PBRadios2" id="PB2_6" value="6">
+								<label class="form-check-label" for="PB2_6">+6</label>
+							</div>								
+						</div>
+						<!--AM2-->
+						<div class="form-group" style="margin-top: -10px">
+							<label for="AM2">Attribute (or ability) modifier:</label>
+							<input type="number" class="form-control" id="AM2" name="AM2" value="1">
+						</div>
+                        <!--add_am_dmg2-->
+						<div class="form-group d-flex align-items-center" style="margin-top: 15px">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="add_am_dmg2" name="add_am_dmg2" checked>
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="add_am_dmg2">Ability Modifier Applies to Damage</label>
+						</div>					
+						<!--Magic Weapon2-->
+						<div class="form-group custom-mt d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="MW2" name="MW2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="MW2">Magic Weapon</label>
+						</div>
+						<div class="form-check-group custom-mt-s hidden" id="magicWeaponRadios2">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="MWradios2" id="MW2_1" value="1">
+								<label class="form-check-label" for="MW2_1">+1</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="MWradios2" id="MW2_2" value="2">
+								<label class="form-check-label" for="MW2_2">+2</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="MWradios2" id="MW2_3" value="3">
+								<label class="form-check-label" for="MW2_3">+3</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="MWradios2" id="MW2_4" value="4">
+								<label class="form-check-label" for="MW2_4">+4</label>
+							</div>							
+						</div>
+						<div class="form-group custom-mt hidden" id="personalCommentA_2">
+                            <label for="MW2_4">For real mate??</label>
+                        </div>
+						<div class="custom-mt-big">FEAT:</div>
+						<!--f_GWM2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">  
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="f_GWM2" name="f_GWM2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="f_GWM2">Great weapon master \ Sharpshooter</label>
+						</div>
+						<!--f_PM2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="f_PM2" name="f_PM2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="f_PM2">Polearm master</label>
+						</div>
+						<div class="custom-mt-big">CLASS FEATURES:</div>
+						<div class="custom-mt-s"><i>Fighting styles</i></div>
+						<!--fs_GWF2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="fs_GWF2" name="fs_GWF2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="fs_GWF2">Great weapon fighter</label>
+						</div>					
+						<!--fs_duelist2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="fs_duelist2" name="fs_duelist2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="fs_duelist2">Duelist fighting style</label>
+						</div>						
+						<!--fs_archer2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="fs_archer2" name="fs_archer2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="fs_archer2">Archer</label>
+						</div>
+						<div class="custom-mt"><i>Fighter</i></div>
+						<!--Champ_f2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="Champ_f2" name="Champ_f2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="Champ_f2">Champion crit improved</label>
+						</div>
+						<div class="custom-mt"><i>Barbarian</i></div>
+						<!--reckless2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="reckless2" name="reckless2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="reckless2">Reckless attack</label>
+						</div>
+						<!--Rage damage2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="rage2" name="rage2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="rage2">Rage damage bonus</label>
+						</div>
+						<div class="form-check-group hidden" id="rageDamageRadios2">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="rageRadios2" id="rage_damage2_2" value="2">
+								<label class="form-check-label" for="rage_damage2_2">+2 damage</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="rageRadios2" id="rage_damage2_3" value="3">
+								<label class="form-check-label" for="rage_damage2_3">+3 damage</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="rageRadios2" id="rage_damage2_4" value="4">
+								<label class="form-check-label" for="rage_damage2_4">+4 damage</label>
+							</div>
+						</div>
+						<!--Rage brutal critical2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="BrutCrit2" name="BrutCrit2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="BrutCrit2">Brutal Critical</label>
+						</div>
+						<div class="form-check-group hidden" id="BrutCritRadios2">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="BC_Radios2" id="BrutCrit2_1" value="1">
+								<label class="form-check-label" for="BrutCrit2_1">+1 dice</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="BC_Radios2" id="BrutCrit2_2" value="2">
+								<label class="form-check-label" for="BrutCrit2_2">+2 dice</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="BC_Radios2" id="BrutCrit2_3" value="3">
+								<label class="form-check-label" for="BrutCrit2_3">+3 dice</label>
+							</div>
+						</div>
+						<div class="custom-mt-big">SPELLS:</div>				
+						<!--BLS2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="BLS2" name="BLS2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="BLS2">Bless</label>
+						</div>  						
+						<!--add_dmg2-->
+						<div class="form-group custom-mt-s d-flex align-items-center">
+							<label class="switch">
+								<input type="checkbox" class="form-check-input" id="add_dmg2" name="add_dmg2">
+								<span class="slider round"></span>
+							</label>
+							<label class="ml-2 custom-ml" for="add_dmg2">On hit additional damage</label>
+						</div>
+						<!--AdditionalDamage2-->
+						<div class="form-group custom-mt-s hidden" id="additionalDamageSection2" >
+						<!--add_dmg_num2-->
+							<label for="add_dmg_num2">Number of Additional Damage Dice:</label>
+							<input type="number" class="form-control" id="add_dmg_num2" name="add_dmg_num2" value="1">
+						<!--add_dmg_val2-->
+							<div class="custom-select custom-mt">
+								<label for="add_dmg_val2">Type of Additional Damage Dice:</label>
+								<select id="add_dmg_val2">
+									<option name="add_dmg_val2"    value="0">Select dice type</option>
+									<option name="add_dmg_val2_4"  id="add_dmg_val2_4" value="4">d4</option>
+									<option name="add_dmg_val2_6"  id="add_dmg_val2_6" value="6">d6</option>
+									<option name="add_dmg_val2_8"  id="add_dmg_val2_8" value="8">d8</option>
+									<option name="add_dmg_val2_10" id="add_dmg_val2_10" value="10">d10</option>
+									<option name="add_dmg_val2_12" id="add_dmg_val2_12" value="12">d12</option>
+								</select>
+							</div>						
+						</div>
+						<table id="data-table">
+							<thead>
+								<tr id="table-head"></tr>
+							</thead>
+							<tbody id="table-body"></tbody>
+						</table>
+						<!-- Aggiungi altri campi qui -->
+                    </fieldset>
+                </div>
+            </div>
+            <br>
+		</form>
+		<!-- Min Max Armor Class -->
+		<div class="form-group custom-mt d-flex justify-content-center">
+			<div class="input-container" style="margin-right: 10px;">
+				<label for="ACmin">Min AC:</label>
+				<input type="number" class="form-control" id="ACmin" name="ACmin" placeholder="5" value="5">
+			</div>
+			<div class="input-container" style="margin-left: 10px;">
+				<label for="ACmax">Max AC:</label>
+				<input type="number" class="form-control" id="ACmax" name="ACmax" placeholder="30" value="10"> <!-- a regime deve essere 20 COMMENT TO DELETE -->
+			</div>
+		</div>
+		<!-- Default turns to simulate -->
+		<div class="form-group custom-mt d-flex align-items-center justify-content-center">
+			<label class="switch custom-mt">
+				<input type="checkbox" id="defaultTurn" name="defaultTurn" checked>
+				<span class="slider round"></span>
+			</label>
+			<label class="ml-2 custom-ml custom-mt" for="defaultTurn">Simulated damage - expected value</label>
+		</div>	
+		<!-- Custom turns selection -->
+		<div class="form-group-center custom-mt align-items-center justify-content-center hidden" id="customTurn">
+			<label class="form-group custom-mt align-items-center justify-content-center" for="turn">Number of turn to simulate:</label>
+			<input type="number" class="form-control custom-ml custom-mt" style="width: 20%; max-width: 80px;" id="turn" name="turn">
+		</div>
+		<!-- Submit button -->
+		<div class="form-group custom-mt d-flex justify-content-center">
+			<button type="button" class="btn btn-primary custom-mt-big" onclick="saveVariables()">Submit</button>
+		</div>
+    </div> 
+
+
+	<!--▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄ TABS ▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀-->
+    
+	<div class="tab-container">
+		<!-- Intestazione dei Tab -->
+		<div class="tab-buttons">
+			<button class="tab-btn active" onclick="openTab(event, 'TABLES')">TABLES</button>
+			<button class="tab-btn" onclick="openTab(event, 'GRAPHS')">GRAPHS</button>
+		</div>
+
+		<!-- Contenitore dei Tab -->
+		<div class="tab-content">
+			<div id="TABLES" class="tab-panel active">			
+				<div id="mean-container" style="margin-bottom: 25px;"></div>  <!-- Contenitore per la tabella dei valori medi -->
+				<div id="summary-container" style="margin-bottom: 25px;"></div> <!-- Nuova tabella dei totali -->
+				<div id="table-container"></div> <!-- Questo è dove metteremo la tabella dettagliata -->
+			</div>
+			<div id="GRAPHS" class="tab-panel">
+				<div id="chartContainer"
+					 style="height: 600px;      /* alza pure l’altezza se vuoi */
+							width: 100%;        /* occupa tutta la larghezza del contenitore */
+							max-width: none;    /* rimuovi eventuali limiti */
+							background-color: #8c8c8c;">
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Bootstrap JS and dependencies -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+	
+	
+<script>
+
+    // COMPARISON BUTTON
+    document.addEventListener('DOMContentLoaded', function () {
+        const comparisonModeToggle = document.getElementById('comparisonModeToggle');
+        const firstATTACKER = document.getElementById('FIRST');
+        const secondATTACKER = document.getElementById('SECOND');
+
+        function updateSecondAttackerVisibility() {
+            firstATTACKER.classList.toggle('hidden', !comparisonModeToggle.checked);
+            secondATTACKER.classList.toggle('hidden', !comparisonModeToggle.checked);
+        }
+        comparisonModeToggle.addEventListener('change', updateSecondAttackerVisibility);
+        updateSecondAttackerVisibility();
+    });
+    // SCROLL-DOWN MENU CODE
+    document.addEventListener("DOMContentLoaded", function () {
+        const customSelects = document.querySelectorAll(".custom-select");
+
+        customSelects.forEach(customSelect => {
+            const select = customSelect.querySelector("select");
+            const selected = document.createElement("div");
+            selected.classList.add("select-selected");
+            selected.innerHTML = select.options[select.selectedIndex].innerHTML;
+            customSelect.appendChild(selected);
+
+            const items = document.createElement("div");
+            items.classList.add("select-items", "select-hide");
+
+            Array.from(select.options).slice(1).forEach(option => {
+                const item = document.createElement("div");
+                item.innerHTML = option.innerHTML;
+                item.addEventListener("click", function () {
+                    select.selectedIndex = [...select.options].findIndex(opt => opt.innerHTML === this.innerHTML);
+                    selected.innerHTML = this.innerHTML;
+
+                    const allItems = items.querySelectorAll(".same-as-selected");
+                    allItems.forEach(el => el.classList.remove("same-as-selected"));
+                    this.classList.add("same-as-selected");
+
+                    selected.click();
+                });
+                items.appendChild(item);
+            });
+
+            customSelect.appendChild(items);
+            selected.addEventListener("click", function (e) {
+                e.stopPropagation();
+                closeAllSelect(this);
+                items.classList.toggle("select-hide");
+                this.classList.toggle("select-arrow-active");
+            });
+        });
+
+        function closeAllSelect(element) {
+            const allItems = document.querySelectorAll(".select-items");
+            const allSelected = document.querySelectorAll(".select-selected");
+            allItems.forEach((item, index) => {
+                if (element !== allSelected[index]) {
+                    item.classList.add("select-hide");
+                    allSelected[index].classList.remove("select-arrow-active");
+                }
+            });
+        }
+
+        document.addEventListener("click", closeAllSelect);
+    });
+
+    // MW FUNCTION
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[id^="MW"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const attackerNumber = this.id.match(/\d+/)[0];
+                const radios = document.getElementById(`magicWeaponRadios${attackerNumber}`);
+                const comment = document.getElementById(`personalCommentA_${attackerNumber}`);
+
+                radios.classList.toggle('hidden', !this.checked);
+                if (!this.checked) {
+                    comment.classList.add('hidden');
+                    document.querySelectorAll(`input[name="MWradios${attackerNumber}"]`).forEach(radio => {
+                        radio.checked = false;
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll('input[name^="MWradios"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const attackerNumber = this.name.match(/\d+/)[0];
+                const comment = document.getElementById(`personalCommentA_${attackerNumber}`);
+                comment.classList.toggle('hidden', !(this.checked && this.value == "4"));
+            });
+        });
+    });
+
+    // Rage FUNCTIONS
+    document.addEventListener('DOMContentLoaded', function () {
+        function toggleVisibility(checkbox, radioGroup, container) {
+            checkbox.addEventListener('change', function () {
+                container.classList.toggle('hidden', !checkbox.checked);
+                if (!checkbox.checked) {
+                    radioGroup.forEach(radio => radio.checked = false);
+                }
+            });
+        }
+
+        const rage1Checkbox = document.getElementById('rage1');
+        const rageDamageRadios1 = document.getElementById('rageDamageRadios1');
+        const rageRadios1 = document.getElementsByName('rageRadios1');
+        toggleVisibility(rage1Checkbox, rageRadios1, rageDamageRadios1);
+
+        const rage2Checkbox = document.getElementById('rage2');
+        const rageDamageRadios2 = document.getElementById('rageDamageRadios2');
+        const rageRadios2 = document.getElementsByName('rageRadios2');
+        toggleVisibility(rage2Checkbox, rageRadios2, rageDamageRadios2);
+		
+		// Brutal critical FUNCTIONS
+        const BrutCrit1Checkbox = document.getElementById('BrutCrit1');
+        const BrutCritRadios1 = document.getElementById('BrutCritRadios1');
+        const BC_Radios1 = document.getElementsByName('BC_Radios1');
+        toggleVisibility(BrutCrit1Checkbox, BC_Radios1, BrutCritRadios1);	
+
+		const BrutCrit2Checkbox = document.getElementById('BrutCrit2');
+        const BrutCritRadios2 = document.getElementById('BrutCritRadios2');
+        const BC_Radios2 = document.getElementsByName('BC_Radios2');
+        toggleVisibility(BrutCrit2Checkbox, BC_Radios2, BrutCritRadios2);	
+    });
+
+	
+    // Bonus attack
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[id^="BonusAttack"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                if (!this.checked) {
+                    const attackerNumber = this.id.match(/\d+/)[0];
+                    document.getElementById(`num${attackerNumber}`).value = 1;
+                }
+            });
+        });
+    });
+
+    // Extra damage attack
+    document.addEventListener('DOMContentLoaded', function () {
+        function toggleAdditionalDamage(addDamageCheckbox, additionalDamageTypeInput, additionalDamageNumberInput, additionalDamageSection, selectedElement) {
+            addDamageCheckbox.addEventListener('change', function () {
+                additionalDamageTypeInput.disabled = !addDamageCheckbox.checked;
+                additionalDamageSection.classList.toggle('hidden', !addDamageCheckbox.checked);
+                if (!addDamageCheckbox.checked) {
+                    additionalDamageTypeInput.value = '0';
+                    additionalDamageNumberInput.value = '';
+                    selectedElement.innerHTML = 'Select dice type';
+                }
+            });
+        }
+        const addDamageCheckbox1 = document.getElementById('add_dmg1');
+        const additionalDamageTypeInput1 = document.getElementById('add_dmg_val1');
+        const additionalDamageNumberInput1 = document.getElementById('add_dmg_num1');
+        const additionalDamageSection1 = document.getElementById('additionalDamageSection1');
+        const selectedElement1 = document.querySelector('#add_dmg_val1 + .select-selected');
+        toggleAdditionalDamage(addDamageCheckbox1, additionalDamageTypeInput1, additionalDamageNumberInput1, additionalDamageSection1, selectedElement1);
+
+        const addDamageCheckbox2 = document.getElementById('add_dmg2');
+        const additionalDamageTypeInput2 = document.getElementById('add_dmg_val2');
+        const additionalDamageNumberInput2 = document.getElementById('add_dmg_num2');
+        const additionalDamageSection2 = document.getElementById('additionalDamageSection2');
+        const selectedElement2 = document.querySelector('#add_dmg_val2 + .select-selected');
+        toggleAdditionalDamage(addDamageCheckbox2, additionalDamageTypeInput2, additionalDamageNumberInput2, additionalDamageSection2, selectedElement2);
+    });
+    // Custom turn display
+    document.addEventListener('DOMContentLoaded', function () {
+        const defaultTurnCheckbox = document.getElementById('defaultTurn');
+        const customTurnDiv = document.getElementById('customTurn');
+        const numberOfTurn = document.getElementById('turn');
+
+        function updateVisibility() {
+            const isChecked = defaultTurnCheckbox.checked;
+            customTurnDiv.classList.toggle('hidden', isChecked);
+            if (isChecked) {
+                numberOfTurn.value = '';
+            }
+        }
+
+        defaultTurnCheckbox.addEventListener('change', updateVisibility);
+        updateVisibility();
+    });
+</script>
+
+	<script>
+        // Utility function to get a random integer between min and max, inclusive
+        function randint(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+		// Function to roll a D20
+		// function d20() {
+		//   return randint(1, 20);
+		// }
+		
+		function d20(isReckless) {
+		  if (isReckless) {
+			const roll1 = randint(1, 20);
+			const roll2 = randint(1, 20);
+			const maxRoll = Math.max(roll1, roll2);
+			console.log(`Reckless mode attivo: roll1=${roll1}, roll2=${roll2} -> valore scelto=${maxRoll}`);
+			return maxRoll;
+		  } else {
+			const roll = randint(1, 20);
+			console.log(`Normal mode: roll=${roll}`);
+			return roll;
+		  }
+		}
+		
+		// function d20(isReckless) {
+		//   if (isReckless) {
+		// 	const roll1 = randint(1, 20);
+		// 	const roll2 = randint(1, 20);
+		// 	return Math.max(roll1, roll2);
+		//   } else {
+		// 	return randint(1, 20);
+		//   }
+		// }
+		// Function to return ability modifier to damage based on a condition
+		function amToDmg(AM, ADD_AM_DMG = false) {
+		  return parseInt(ADD_AM_DMG ? AM : 0);
+		}
+		// n: number of dice to roll, m: maximum value of dice (default is 6), 
+        // fs_GWF: boolean for Great Weapon Fighting, C_F: Champion Fighter crit range improved
+        function dann(n, m = 6, fs_GWF = false, C_F = 0, BrutCrit = false, BC_Dices = 0, D20 = null) {
+            let sum = [];
+            // Check for critical hit based on D20 and Champion Fighter crit range
+            if (D20 >= 20 - C_F) {
+                n = n * 2;  // Double the number of dice when critical hit
+				// Barbarian Brutal Critical
+				if (BrutCrit) {
+					n += BC_Dices;
+				console.log(`Numero di dadi di danno=${n}`);	
+				}
+			}
+            for (let i = 0; i < n; i++) {
+                let roll = randint(1, m);
+                // Reroll if Great Weapon Fighting and roll is 1 or 2
+                if (fs_GWF && (roll === 1 || roll === 2)) {
+                    roll = randint(1, m);
+                }
+                sum.push(roll);
+            }
+            return sum.reduce((a, b) => a + b, 0);
+        }
+
+			// Function to calculate damage roll
+function dmgRoll(D20, diceNumber, diceType, Attacker) {
+    console.log(`INSIDE_FUNCTION -> DiceNumber=${diceNumber}, Dice Type=${diceType}, Attacker: ${Attacker}`);
+
+    if (Attacker === "first") {
+        const TotalDAMG = dann( diceNumber, diceType, fsGWF1, ChampF1, BrutCrit1, BC_Radios1, D20);
+        const AddAM = amToDmg(AM1, ADD_AM_DMG1);
+        const bonusMW = parseInt(MWValue1) || 0; // Aggiungi fallback a 0
+        const bonusGWM = gwmDmg(fGWM1);
+		const bonusRAGE = rageDmg(rage1, rageDmg1);
+        const bonusDUEL = fsDuelist(fsDuelist1);
+        const bonusDMG = dmgEffect(addDmgNum1, addDmgVal1);
+        // Verifica i datatype per evitare risultati imprevisti
+        // console.log(`Tipi dei valori: TotalDAMG=${typeof TotalDAMG}, AddAM=${typeof AddAM}, MW=${typeof bonusMW}, GWM=${typeof bonusGWM}, Duelist=${typeof bonusDUEL}, AdditionalDMG=${typeof bonusDMG},RageDMG=${typeof bonusRAGE}`);
+        // Somma e restituzione del totale
+        const SUM = TotalDAMG + AddAM + bonusMW + bonusGWM + bonusDUEL + bonusDMG + bonusRAGE;
+        console.log(`BaseDAMG:${TotalDAMG}, AM:${AddAM}, MW:${bonusMW}, GWM:${bonusGWM}, Duelist:${bonusDUEL}, AdditionalDMG:${bonusDMG}, rageDMG:${bonusRAGE} SUM:${SUM}`);
+        return SUM;
+    } else if (Attacker === "second") {
+        return dann(diceNumber, diceType, fsGWF2, ChampF2, BrutCrit2, BC_Radios2, D20) 
+             + amToDmg(AM2, ADD_AM_DMG2) 
+             + (MW2 ? MWValue2 : 0) 
+             + gwmDmg(fGWM2)
+			 + rageDmg(rage2, rageDmg2)			 
+             + fsDuelist(fsDuelist2) 
+             + dmgEffect(addDmgNum2, addDmgVal2);
+    } else {
+        console.error(`Invalid value ("${Attacker}") assigned to Attacker, please try "first" or "second"`);
+    }
+}
+			
+		// Function to calculate hit roll  
+			// short mode:
+			// function hitRoll(D20, PB, AM, MW=0, fGWM, ARCH, BLS) {
+			//	return D20 + parseInt(PB) + parseInt(AM) + parseInt(MW) + gwmHit(fGWM)+ fsArcher(ARCH) + blss(BLS);
+			//}
+			
+		function hitRoll(D20, PB, AM, MW = 0, fGWM, ARCH, BLS) {
+
+		  // Log dei valori per debug:
+		  const bonusPB = parseInt(PB);
+		  const bonusAM = parseInt(AM);
+		  const bonusMW = parseInt(MW);
+		  const bonusGWM = gwmHit(fGWM);
+		  const bonusARCH = fsArcher(ARCH);
+		  const bonusBLS = blss(BLS);
+		  console.log(`D20: ${D20}, PB: ${bonusPB}, AM: ${bonusAM}, MW: ${bonusMW}, GWM: ${bonusGWM}, ARCH: ${bonusARCH}, BLS: ${bonusBLS}`);
+		  return D20 + bonusPB + bonusAM + bonusMW + bonusGWM + bonusARCH + bonusBLS;
+}
+
+		// FIGHTING STYLES	
+		// Archer
+		function fsArcher(ARCH = false) {
+			return ARCH ? 2 : 0;
+		}
+		// Duelist
+		function fsDuelist(DUEL = false) {
+			return DUEL ? 2 : 0;
+		}
+		// FEATS
+		// Great Weapon Master (separate hit roll and damage)
+		function gwmHit(f_GWM) {
+			return f_GWM ? -5 : 0;
+		}
+		function gwmDmg(f_GWM) {
+			return f_GWM ? 10 : 0;
+		}
+		function rageDmg(f_RAGE = false, RAGEvalue = 0) {
+			return f_RAGE ? RAGEvalue : 0;
+		}
+		// SPELLS
+		function blss(BLS = false) {
+			return BLS ? randint(1, 4) : 0;
+		}
+		function dmgEffect(ADD_DMG = false, DMG_VAL = 6) {
+			return ADD_DMG ? randint(1, DMG_VAL) : 0;
+		}
+	</script>
+
+	<!-- DICES PART -->	
+	<script>
+// ✅ Dichiarazione globale del dataframe
+let df = [];
+
+window.onload = function() {
+    console.log("✅ Pagina completamente caricata.");
+};
+
+	// Funzione per aprire i tab
+	function openTab(evt, tabName) {
+		let tabPanels = document.querySelectorAll(".tab-panel");
+		tabPanels.forEach(panel => panel.classList.remove("active"));
+		let tabBtns = document.querySelectorAll(".tab-btn");
+		tabBtns.forEach(btn => btn.classList.remove("active"));
+
+		document.getElementById(tabName).classList.add("active");
+		evt.currentTarget.classList.add("active");
+}
+    function saveVariables() {
+		console.log("🔄 Esecuzione saveVariables()");
+		const comparisonMode = document.getElementById('comparisonModeToggle')?.checked || false;
+		
+		df = [];  // ✅ Usa df globale senza let per non ridefinirlo localmente
+	
+		// First Attacker Variables
+		label1 = document.getElementById('label1').value;
+		swing1 = parseInt(document.getElementById('swing1').value) || 1;
+		bonusAttack1 = document.getElementById('BonusAttack1')?.checked;
+		d_num1 = parseInt(document.getElementById('num1').value) || 1;
+		d_val1 = parseInt(document.querySelector('select[name="val1"]').value) || 6;
+		PB1 = document.querySelector('input[name="PBradios1"]:checked').value;
+		AM1 = document.getElementById('AM1')?.value;
+		ADD_AM_DMG1 = document.getElementById('add_am_dmg1')?.checked;
+		MW_1 = document.getElementById('MW1')?.checked;
+		MWValue1 = parseInt(document.querySelector('input[name="MWradios1"]:checked')?.value) || 0;
+		fGWM1 = document.getElementById('f_GWM1')?.checked;
+		fPM1 = document.getElementById('f_PM1')?.checked;
+		fsGWF1 = document.getElementById('fs_GWF1')?.checked;
+		fsDuelist1 = document.getElementById('fs_duelist1')?.checked;
+		fsArcher1 = document.getElementById('fs_archer1')?.checked;
+		ChampF1 = document.getElementById('Champ_f1')?.checked;
+		reckless1 = document.getElementById('reckless1')?.checked;
+		rage1 = document.getElementById('rage1')?.checked;
+		rageDmg1 = parseInt(document.querySelector('input[name="rageRadios1"]:checked')?.value) || 0;		
+		BrutCrit1 = document.getElementById('BrutCrit1')?.checked;
+		BC_Radios1 = parseInt(document.querySelector('input[name="BC_Radios1"]:checked')?.value) || 0;
+		BLS1 = document.getElementById('BLS1')?.checked;
+		addDmg1 = document.getElementById('add_dmg1')?.checked;
+		addDmgNum1 = parseInt(document.getElementById('add_dmg_num1')?.value) || 0;
+		addDmgVal1 = parseInt(document.querySelector('select[id="add_dmg_val1"]')?.value) || 0;
+		
+		ACmin = parseInt(document.getElementById('ACmin').value) || 5;
+		ACmax = parseInt(document.getElementById('ACmax').value) || 30;
+		
+		default_Turn = document.getElementById('defaultTurn')?.checked;
+		turn = parseInt(document.getElementById('turn').value) || 1; //a regime deve essere 9999 commento to delete
+
+		let firstAttackerLog = `
+			First Attacker Variables:
+			Label 1: ${label1}
+			swing 1: ${swing1}
+			Bonus Attack 1: ${bonusAttack1}
+			Num 1: ${d_num1}
+			Val 1: ${d_val1}
+			PB 1: ${PB1}
+			AM 1: ${AM1}
+			Add AM Dmg 1: ${ADD_AM_DMG1}
+			MW 1: ${MW_1}
+			MW Value 1: ${MWValue1}
+			fGWM 1: ${fGWM1}
+			fPM 1: ${fPM1}
+			fsGWF 1: ${fsGWF1}
+			fsDuelist 1: ${fsDuelist1}
+			fsArcher 1: ${fsArcher1}
+			Champ F 1: ${ChampF1}
+			Reckless 1: ${reckless1}
+			Rage 1: ${rage1}
+			Rage Damage 1: ${rageDmg1}
+			Brutal Crit 1: ${BrutCrit1}
+			Brutal Crit Dice 1: ${BC_Radios1}
+			BLS 1: ${BLS1}
+			Add Dmg 1: ${addDmg1}
+			Add Dmg Num 1: ${addDmgNum1}
+			Add Dmg Val 1: ${addDmgVal1}
+
+			AC Min: ${ACmin}
+			AC Max: ${ACmax}
+			default_Turn: ${default_Turn}
+			turn: ${turn}
+			`;
+		console.log(firstAttackerLog);
+
+		// Second Attacker Variables (if comparison mode is enabled)
+		if (comparisonMode) {
+			label2 = document.getElementById('label2')?.value;
+			swing2 = parseInt(document.getElementById('swing2')?.value) || 1;
+			bonusAttack2 = document.getElementById('BonusAttack2')?.checked;
+			d_num2 = parseInt(document.getElementById('num2')?.value) || 1;
+			d_val2 = parseInt(document.querySelector('select[name="val2"]')?.value) || 6;
+			PB2 = document.querySelector('input[name="PBRadios2"]:checked')?.value;
+			AM2 = parseInt(document.getElementById('AM2')?.value) || 0;
+			ADD_AM_DMG2 = document.getElementById('add_am_dmg2')?.checked;
+			MW2 = document.getElementById('MW2')?.checked;
+			MWValue2 = parseInt(document.querySelector('input[name="MWradios2"]:checked')?.value) || 0;
+			fGWM2 = document.getElementById('f_GWM2')?.checked;
+			fPM2 = document.getElementById('f_PM2')?.checked;
+			fsGWF2 = document.getElementById('fs_GWF2')?.checked;
+			fsDuelist2 = document.getElementById('fs_duelist2')?.checked;
+			fsArcher2 = document.getElementById('fs_archer2')?.checked;
+			ChampF2 = document.getElementById('Champ_f2')?.checked;
+			reckless2 = document.getElementById('reckless2')?.checked;
+			rage2 = document.getElementById('rage2')?.checked;
+			rageDmg2 = parseInt(document.querySelector('input[name="rageRadios2"]:checked')?.value) || 0;
+			BrutCrit2 = document.getElementById('BrutCrit2')?.checked;
+			BC_Radios2 = parseInt(document.querySelector('input[name="BC_Radios2"]:checked')?.value) || 0;
+			BLS2 = document.getElementById('BLS2')?.checked;
+			addDmg2 = document.getElementById('add_dmg2')?.checked;
+			addDmgNum2 = parseInt(document.getElementById('add_dmg_num2')?.value) || 0;
+			addDmgVal2 = parseInt(document.querySelector('select[id="add_dmg_val2"]')?.value) || 0;
+
+			let secondAttackerLog = `
+				Second Attacker Variables:
+				Label 2: ${label2}
+				swing 2: ${swing2}
+				Bonus Attack 2: ${bonusAttack2}
+				Num 2: ${d_num2}
+				Val 2: ${d_val2}
+				PB 2: ${PB2}
+				AM 2: ${AM2}
+				Add AM Dmg 2: ${ADD_AM_DMG2}
+				MW 2: ${MW2}
+				MW Value 2: ${MWValue2}
+				fGWM 2: ${fGWM2}
+				fPM 2: ${fPM2}
+				fsGWF 2: ${fsGWF2}
+				fsDuelist 2: ${fsDuelist2}
+				fsArcher 2: ${fsArcher2}
+				Champ F 2: ${ChampF2}
+				Reckless 2: ${reckless2}
+				Rage 2: ${rage2}
+				Rage Damage 2: ${rageDmg2}
+				Brutal Crit 1: ${BrutCrit2}
+				Brutal Crit Dice 1: ${BC_Radios2}
+				BLS 2: ${BLS2}
+				Add Dmg 2: ${addDmg2}
+				Add Dmg Num 2: ${addDmgNum2}
+				Add Dmg Val 2: ${addDmgVal2}
+				`;
+				console.log(secondAttackerLog);
+		};
+	
+		console.log("🔄 Esecuzione saveVariables()");
+    
+		
+// Reset del dataframe e calcolo dell'array degli AC
+df = [];
+let AC = Array.from({ length: ACmax - ACmin + 1 }, (_, i) => i + ACmin);
+
+// Creazione del contenitore per visualizzare i risultati (opzionale)
+const resultsContainer = document.createElement('div');
+resultsContainer.setAttribute('id', 'resultsContainer');
+document.body.appendChild(resultsContainer);
+
+// Ciclo per ogni valore di AC e per ogni turno simulato
+for (let ac of AC) {
+    console.log(`AC: ${ac}`);
+    for (let i = 0; i < turn; i++) {
+
+        // ---------------------
+        // Simulazione per Attacker 1
+        // ---------------------
+        let dmg1_list = [];    // Lista dei danni per ogni attacco dell'attacker 1
+        let GotIt1_list = [];  // Lista dei colpi riusciti per l'attacker 1
+
+        for (let swing = 1; swing <= swing1; swing++) { 
+            console.log(`Attacker1 - attacco numero ${swing}`);
+            const Dice20_1 = d20(reckless1);  // Simula un tiro di d20 per attacker 1
+            let tpc1 = hitRoll(Dice20_1, PB1, AM1, MWValue1, fGWM1, fsArcher1, BLS1);
+            let damage1;
+            // Se il tiro (hit roll) supera l'AC e il d20 non è 1 (fallimento automatico)
+            if (tpc1 >= ac && Dice20_1 != 1) {
+                console.log(`Attacker1 - Dati pre-danno: TPC=${tpc1}, NumberDicesTossed=${d_num1}, diceType=${d_val1}`);
+                damage1 = dmgRoll(Dice20_1, d_num1, d_val1, 'first');
+                console.log(`Attacker1 - DANNO attacco ${swing}° = ${damage1}`);
+                GotIt1_list.push(1);
+            } else {
+                damage1 = 0; // Attacco fallito → 0 danni
+                console.log(`Attacker1 - Fallimento: TPC=${tpc1}, NumberDicesTossed=${d_num1}, diceType=${d_val1}`);
+                console.log(`Attacker1 - DANN0 attacco ${swing}° = ${damage1}`);
+                GotIt1_list.push(0);
+            }
+            dmg1_list.push(damage1);
+        }
+        // Gestione dell’attacco bonus per attacker 1
+        if (fPM1 === true || bonusAttack1 === true) {
+            console.log(`Attacker1 - BONUS ATTACK`);
+            const bonusDice20_1 = d20(reckless1);  // Tiro bonus per attacker 1
+            let bonusTPC1 = hitRoll(bonusDice20_1, PB1, AM1, MWValue1, fGWM1, fsArcher1, BLS1);
+            let bonusDamage1;
+            if (bonusTPC1 >= ac && bonusDice20_1 !== 1) {
+                // Se l'opzione Polearm Master è attiva, l'attacco bonus usa 1 d4, altrimenti utilizza i parametri standard
+                if (fPM1 === true) {
+                    bonusDamage1 = dmgRoll(bonusDice20_1, 1, 4, 'first');
+                } else {
+                    bonusDamage1 = dmgRoll(bonusDice20_1, d_num1, d_val1, 'first');
+                }
+                GotIt1_list.push(1);
+            } else {
+                bonusDamage1 = 0;
+                GotIt1_list.push(0);
+            }
+            dmg1_list.push(bonusDamage1);
+            console.log(`Attacker1 - BONUS DANNO = ${bonusDamage1}`);
+        }
+        let damage1 = dmg1_list.reduce((a, b) => a + b, 0);
+        let GotIt1 = GotIt1_list.reduce((a, b) => a + b, 0);
+
+        // ---------------------
+        // Simulazione per Attacker 2 (solo se COMPARISON MODE è attivo)
+        // ---------------------
+        if (comparisonMode) {
+            let dmg2_list = [];    // Lista dei danni per ogni attacco dell'attacker 2
+            let GotIt2_list = [];  // Lista dei colpi riusciti per l'attacker 2
+
+            for (let swing = 1; swing <= swing2; swing++) { 
+                console.log(`Attacker2 - attacco numero ${swing}`);
+                const Dice20_2 = d20(reckless2);  // Tiro di d20 per attacker 2
+                let tpc2 = hitRoll(Dice20_2, PB2, AM2, MWValue2, fGWM2, fsArcher2, BLS2);
+                let damage2;
+                if (tpc2 >= ac && Dice20_2 != 1) {
+                    console.log(`Attacker2 - Dati pre-danno: TPC=${tpc2}, NumberDicesTossed=${d_num2}, diceType=${d_val2}`);
+                    damage2 = dmgRoll(Dice20_2, d_num2, d_val2, 'second');
+                    console.log(`Attacker2 - DANNO attacco ${swing}° = ${damage2}`);
+                    GotIt2_list.push(1);
+                } else {
+                    damage2 = 0;
+                    console.log(`Attacker2 - Fallimento: TPC=${tpc2}, NumberDicesTossed=${d_num2}, diceType=${d_val2}`);
+                    console.log(`Attacker2 - DANN0 attacco ${swing}° = ${damage2}`);
+                    GotIt2_list.push(0);
+                }
+                dmg2_list.push(damage2);
+            }
+            // Gestione dell’attacco bonus per attacker 2
+            if (fPM2 === true || bonusAttack2 === true) {
+                console.log(`Attacker2 - BONUS ATTACK`);
+                const bonusDice20_2 = d20(reckless2);
+                let bonusTPC2 = hitRoll(bonusDice20_2, PB2, AM2, MWValue2, fGWM2, fsArcher2, BLS2);
+                let bonusDamage2;
+                if (bonusTPC2 >= ac && bonusDice20_2 !== 1) {
+                    if (fPM2 === true) {
+                        bonusDamage2 = dmgRoll(bonusDice20_2, 1, 4, 'second');
+                    } else {
+                        bonusDamage2 = dmgRoll(bonusDice20_2, d_num2, d_val2, 'second');
+                    }
+                    GotIt2_list.push(1);
+                } else {
+                    bonusDamage2 = 0;
+                    GotIt2_list.push(0);
+                }
+                dmg2_list.push(bonusDamage2);
+                console.log(`Attacker2 - BONUS DANNO = ${bonusDamage2}`);
+            }
+            let damage2 = dmg2_list.reduce((a, b) => a + b, 0);
+            let GotIt2 = GotIt2_list.reduce((a, b) => a + b, 0);
+
+            // Salvataggio dei risultati nel dataframe includendo le colonne per l'attacker 2
+            df.push({ AC: ac, Damage1: damage1, LandedHit1: GotIt1, Damage2: damage2, LandedHit2: GotIt2 });
+            console.log(`Riga salvata per AC=${ac}: Damage1=${damage1}, LandedHit1=${GotIt1}, Damage2=${damage2}, LandedHit2=${GotIt2}`);
+        } else {
+            // Se la modalità confronto non è attiva, salva solo i dati per l'attacker 1
+            df.push({ AC: ac, Damage1: damage1, LandedHit1: GotIt1 });
+            console.log(`Riga salvata per AC=${ac}: Damage1=${damage1}, LandedHit1=${GotIt1}`);
+        }
+    }
+}
+
+
+let container = document.getElementById("chartContainer");
+let chart = new CanvasJS.Chart("chartContainer", {
+    width:  container.offsetWidth,
+    height:  container.offsetHeight,
+    /* …resto delle opzioni… */
+});
+
+// Calcola il numero massimo di attacchi per turno per ciascun attacker.
+// Questi valori devono essere gli stessi usati per calcolare le percentuali nella tabella "MEAN VALUES".
+let maxHitsA1 = swing1 + ((bonusAttack1 || f_PM1) ? 1 : 0);
+let maxHitsA2 = null;
+if (comparisonMode) {
+    maxHitsA2 = swing2 + ((bonusAttack2 || f_PM2) ? 1 : 0);
+}
+
+// Usa la funzione computeHittingProbabilities per ottenere gli array necessari
+const { acArray, hitProb1, hitProb2 } = computeHittingProbabilities(df, maxHitsA1, maxHitsA2);
+
+// Se comparison mode è attivo, usa entrambi i dataset, altrimenti usa solo il primo.
+// Per la label dell'attacker 2, se non è presente, puoi mettere una stringa vuota.
+let labelA1 = label1;
+let labelA2 = (comparisonMode) ? label2 : "";
+
+drawHittingProbabilityChart(acArray, hitProb1, hitProb2, labelA1, labelA2);		
+	
+		
+		// Visualizza il numero di righe finali nel dataframe
+		const finalRowCountDiv = document.createElement('div');
+		finalRowCountDiv.textContent = `Numero di righe: ${df.length}`;
+		resultsContainer.appendChild(finalRowCountDiv);
+		console.log("Numero totale di righe nel dataframe:", df.length);
+		console.log(df);		
+		// Aggiorna la tabella dopo aver aggiornato df
+		updateTable();
+
+	}
+
+	
+	// Funzione per aggiornare la tabella
+	function updateTable() {
+        console.log("🛠️ Creazione tabella...");
+
+        const tableContainer = document.getElementById("table-container");
+        const summaryContainer = document.getElementById("summary-container");
+        const meanContainer = document.getElementById("mean-container");
+
+        if (!tableContainer || !summaryContainer || !meanContainer) {
+            console.error("❌ ERRORE: Un contenitore non esiste nel DOM!");
+            return;
+        }
+
+        // Puliamo i contenitori prima di creare nuove tabelle
+        tableContainer.innerHTML = "";
+        summaryContainer.innerHTML = "";
+        meanContainer.innerHTML = "";
+
+        if (!df || df.length === 0) {
+            console.warn("⚠️ Nessun dato disponibile per creare le tabelle.");
+            return;
+        }
+
+        console.log("📊 Generazione tabella completa con", df.length, "righe...");
+        
+	
+
+		
+        // Creiamo le tabelle
+        const meanTitle = document.createElement("h3");
+        meanTitle.textContent = "MEAN VALUES";
+        meanTitle.style.textAlign = "center"; 
+
+        const summaryTitle = document.createElement("h3");
+        summaryTitle.textContent = "SUM BY AC";
+        summaryTitle.style.textAlign = "center"; 
+		
+		const fullTitle = document.createElement("h3");
+        fullTitle.textContent = "All table";
+        fullTitle.style.textAlign = "center"; 
+
+        const meanTable = createMeanTable(df);
+        const summaryTable = createSummaryTable(df);
+        const fullTable = createTable(df);
+
+        // Aggiungiamo le tabelle nei rispettivi contenitori
+        meanContainer.appendChild(meanTitle);
+        meanContainer.appendChild(meanTable);
+        
+        summaryContainer.appendChild(summaryTitle);
+        summaryContainer.appendChild(summaryTable);
+
+        tableContainer.appendChild(fullTitle);
+		tableContainer.appendChild(fullTable);
+
+        console.log("✅ Tabelle aggiornate correttamente.");
+    }
+	
+	
+function createMeanTable(data) {
+    console.log("📊 Creazione tabella dei valori medi per AC...");
+    const meanSummary = {};
+    // Raggruppa i dati per ogni AC
+    data.forEach(row => {
+        const ac = row.AC;
+        if (!meanSummary[ac]) {
+            // Inizializziamo le variabili per entrambi gli attacker
+            meanSummary[ac] = { 
+                sumDamage1: 0, landedHits1: 0,
+                sumDamage2: 0, landedHits2: 0,
+                count: 0
+            };
+        }
+        meanSummary[ac].sumDamage1 += row.Damage1;
+        meanSummary[ac].landedHits1 += row.LandedHit1;
+        // Se esistono i dati per il secondo attacker, aggregali
+        if (row.Damage2 !== undefined) {
+            meanSummary[ac].sumDamage2 += row.Damage2;
+            meanSummary[ac].landedHits2 += row.LandedHit2;
+        }
+        meanSummary[ac].count += 1;
+    });
+
+    // Creazione della tabella
+    const table = document.createElement("table");
+    table.border = "1";
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.marginTop = "10px"; 
+
+    // Costruisci l'intestazione: se esiste Damage2, aggiungi le colonne per il secondo attacker
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    // Colonna AC è sempre presente
+    const thAC = document.createElement("th");
+    thAC.textContent = "AC";
+    headerRow.appendChild(thAC);
+    // Colonne per attacker 1
+    const thDam1 = document.createElement("th");
+    thDam1.textContent = "Damage Mean (A1)";
+    headerRow.appendChild(thDam1);
+    const thHit1 = document.createElement("th");
+    thHit1.textContent = "Landed Hit % (A1)";
+    headerRow.appendChild(thHit1);
+
+    // Se il primo oggetto ha la proprietà Damage2, aggiungiamo le colonne per l'attacker 2
+    if (data[0].Damage2 !== undefined) {
+        const thDam2 = document.createElement("th");
+        thDam2.textContent = "Damage Mean (A2)";
+        headerRow.appendChild(thDam2);
+        const thHit2 = document.createElement("th");
+        thHit2.textContent = "Landed Hit % (A2)";
+        headerRow.appendChild(thHit2);
+    }
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Corpo della tabella
+    const tbody = document.createElement("tbody");
+    // Si assume che le variabili globali swing1 e bonusAttack1 (o f_PM1) siano definite per attacco1 e
+    // analogamente swing2 e bonusAttack2 (o f_PM2) per attacco2.
+    const maxHitsA1 = swing1 + ((bonusAttack1 || f_PM1) ? 1 : 0);
+    const maxHitsA2 = (data[0].Damage2 !== undefined) ? (swing2 + ((bonusAttack2 || f_PM2) ? 1 : 0)) : null;
+    
+    Object.entries(meanSummary).forEach(([ac, values]) => {
+        const tr = document.createElement("tr");
+        // Colonna AC
+        const tdAC = document.createElement("td");
+        tdAC.textContent = ac;
+        tr.appendChild(tdAC);
+        // Calcola media e percentuale per Attacker 1
+        const damageMean1 = (values.sumDamage1 / values.count).toFixed(1);
+        const hitPct1 = (((values.landedHits1 / values.count) / maxHitsA1) * 100).toFixed(2) + "%";
+        const tdDam1 = document.createElement("td");
+        tdDam1.textContent = damageMean1;
+        tr.appendChild(tdDam1);
+        const tdHit1 = document.createElement("td");
+        tdHit1.textContent = hitPct1;
+        tr.appendChild(tdHit1);
+
+        // Se presente, calcola anche per Attacker 2
+        if (maxHitsA2 !== null) {
+            const damageMean2 = (values.sumDamage2 / values.count).toFixed(1);
+            const hitPct2 = (((values.landedHits2 / values.count) / maxHitsA2) * 100).toFixed(2) + "%";
+            const tdDam2 = document.createElement("td");
+            tdDam2.textContent = damageMean2;
+            tr.appendChild(tdDam2);
+            const tdHit2 = document.createElement("td");
+            tdHit2.textContent = hitPct2;
+            tr.appendChild(tdHit2);
+        }
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    
+    console.log("✅ Tabella dei valori medi per AC creata.");
+    return table;
+}
+function createSummaryTable(data) {
+    console.log("📊 Creazione tabella riassuntiva...");
+    const summary = {};
+    // Aggrega i dati per ogni AC
+    data.forEach(row => {
+        const ac = row.AC;
+        if (!summary[ac]) {
+            summary[ac] = { 
+                sumDamage1: 0, landedHits1: 0,
+                sumDamage2: 0, landedHits2: 0
+            };
+        }
+        summary[ac].sumDamage1 += row.Damage1;
+        summary[ac].landedHits1 += row.LandedHit1;
+        if (row.Damage2 !== undefined) {
+            summary[ac].sumDamage2 += row.Damage2;
+            summary[ac].landedHits2 += row.LandedHit2;
+        }
+    });
+
+    // Creiamo la tabella
+    const table = document.createElement("table");
+    table.border = "1";
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.marginTop = "10px"; 
+
+    const thead = document.createElement("thead");
+    
+    // Prima riga di intestazione
+    const headerRow1 = document.createElement("tr");
+    const thAC = document.createElement("th");
+    thAC.textContent = "AC";
+    thAC.rowSpan = "2";
+    headerRow1.appendChild(thAC);
+    
+    // Intestazione per il primo attaccante
+    const thA1 = document.createElement("th");
+    thA1.textContent = "First Attacker";
+    thA1.colSpan = "2";
+    thA1.style.textAlign = "center";
+    headerRow1.appendChild(thA1);
+
+    // Se i dati includono il secondo attacker, aggiungiamo un'altra intestazione
+    if (data[0].Damage2 !== undefined) {
+        const thA2 = document.createElement("th");
+        thA2.textContent = "Second Attacker";
+        thA2.colSpan = "2";
+        thA2.style.textAlign = "center";
+        headerRow1.appendChild(thA2);
+    }
+    thead.appendChild(headerRow1);
+    
+    // Seconda riga di intestazione
+    const headerRow2 = document.createElement("tr");
+    // Per il primo attaccante
+    const thSum1 = document.createElement("th");
+    thSum1.textContent = "Damage Sum";
+    headerRow2.appendChild(thSum1);
+    const thHits1 = document.createElement("th");
+    thHits1.textContent = "Landed Hit";
+    headerRow2.appendChild(thHits1);
+    // Per il secondo attaccante (se presente)
+    if (data[0].Damage2 !== undefined) {
+        const thSum2 = document.createElement("th");
+        thSum2.textContent = "Damage Sum";
+        headerRow2.appendChild(thSum2);
+        const thHits2 = document.createElement("th");
+        thHits2.textContent = "Landed Hit";
+        headerRow2.appendChild(thHits2);
+    }
+    thead.appendChild(headerRow2);
+    table.appendChild(thead);
+
+    // Corpo della tabella
+    const tbody = document.createElement("tbody");
+    Object.entries(summary).forEach(([ac, values]) => {
+        const tr = document.createElement("tr");
+        // Colonna AC
+        const tdAC = document.createElement("td");
+        tdAC.textContent = ac;
+        tr.appendChild(tdAC);
+        // Dati per il primo attaccante
+        const tdSum1 = document.createElement("td");
+        tdSum1.textContent = values.sumDamage1;
+        tr.appendChild(tdSum1);
+        const tdHits1 = document.createElement("td");
+        tdHits1.textContent = values.landedHits1;
+        tr.appendChild(tdHits1);
+        // Dati per il secondo attaccante (se disponibili)
+        if (data[0].Damage2 !== undefined) {
+            const tdSum2 = document.createElement("td");
+            tdSum2.textContent = values.sumDamage2;
+            tr.appendChild(tdSum2);
+            const tdHits2 = document.createElement("td");
+            tdHits2.textContent = values.landedHits2;
+            tr.appendChild(tdHits2);
+        }
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    
+    console.log("✅ Tabella riassuntiva creata.");
+    return table;
+}
+	
+
+// Funzione per creare la tabella
+function createTable(data) {
+    const table = document.createElement("table");
+    table.border = "1";
+
+    // Creiamo l'intestazione della tabella
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    Object.keys(data[0]).forEach(col => {
+        const th = document.createElement("th");
+        th.textContent = col;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Creiamo il corpo della tabella
+    const tbody = document.createElement("tbody");
+    data.forEach(row => {
+        const tr = document.createElement("tr");
+        Object.values(row).forEach(value => {
+            const td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    return table;
+}
+
+
+
+function computeHittingProbabilities(df, maxHitsA1, maxHitsA2) {
+    let summary = {};
+    // Raggruppa per AC
+    df.forEach(row => {
+        const ac = row.AC;
+        if (!summary[ac]) {
+            summary[ac] = { landedHits1: 0, landedHits2: 0, count: 0 };
+        }
+        summary[ac].landedHits1 += row.LandedHit1;
+        if (row.Damage2 !== undefined && row.LandedHit2 !== undefined) {
+            summary[ac].landedHits2 += row.LandedHit2;
+        }
+        summary[ac].count++;
+    });
+
+    let acArray = [];
+    let hitProb1 = [];
+    let hitProb2 = [];
+    // Per ogni AC, calcola la percentuale:
+    // Percentuale = (media dei colpi riusciti per turni / (numero di attacchi per turno)) * 100
+    for (let ac in summary) {
+        acArray.push(parseInt(ac));
+        let avgHitPct1 = (summary[ac].landedHits1 / (summary[ac].count * maxHitsA1)) * 100;
+        hitProb1.push(avgHitPct1);
+        if (maxHitsA2 !== null) {
+            let avgHitPct2 = (summary[ac].landedHits2 / (summary[ac].count * maxHitsA2)) * 100;
+            hitProb2.push(avgHitPct2);
+        }
+    }
+    // Ordina i dati in base agli AC
+    const sortedIndices = acArray.map((ac, i) => i).sort((i, j) => acArray[i] - acArray[j]);
+    acArray = sortedIndices.map(i => acArray[i]);
+    hitProb1 = sortedIndices.map(i => hitProb1[i]);
+    if (maxHitsA2 !== null) {
+        hitProb2 = sortedIndices.map(i => hitProb2[i]);
+    }
+    return { acArray, hitProb1, hitProb2 };
+}
+
+		// Esempio di funzione: “drawHittingProbabilityChart”
+function drawHittingProbabilityChart(acValues, hitProb1, hitProb2, label1, label2) {
+    // Prepara i dataPoints per ciascuna serie
+    let dataPointsA1 = [];
+    let dataPointsA2 = [];
+    for (let i = 0; i < acValues.length; i++) {
+        dataPointsA1.push({ x: acValues[i], y: hitProb1[i] });
+        if (hitProb2 && hitProb2.length > 0) {
+            dataPointsA2.push({ x: acValues[i], y: hitProb2[i] });
+        }
+    }
+  
+    let chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        backgroundColor: "#bfbfbf",  // colore "interno" del grafico
+        title:{
+            text: `Hitting probability - by AC \n${label1} Vs. ${label2}`,
+            fontSize: 18
+        },
+        axisX: {
+            title: "AC",
+            interval: 1,
+            tickLength: 0,
+            minimum: Math.min(...acValues),
+            maximum: Math.max(...acValues)
+        },
+        axisY: {
+            title: "Frequency hitting %",
+            gridThickness: 1,
+            minimum: 0,
+            maximum: 100,
+            interval: 10
+        },
+        legend: {
+            verticalAlign: "top"
+        },
+        data: [
+            {
+                type: "line",
+                markerSize: 6,
+                markerType: "circle",
+                color: "red",
+                showInLegend: true,
+                name: label1,
+                toolTipContent: "{name} - AC: {x}, HitProb: {y}%",
+                dataPoints: dataPointsA1
+            },
+            {
+                type: "line",
+                markerSize: 6,
+                markerType: "circle",
+                color: "#6667ff",
+                showInLegend: true,
+                name: label2,
+                toolTipContent: "{name} - AC: {x}, HitProb: {y}%",
+                dataPoints: dataPointsA2
+            }
+        ]
+    });
+
+    chart.render();
+}	
+
+	</script>
+	
+<!-- TABELLE: 
+1. Danno e hit MEDI
+2. % danno 
+3. % danno senza 0 (miss) 
+4. Danno e hit SOMMA
+
+-->
+
+<!-- To add: 
+1.Give blocking error if not selecting dice type
+2.Barbarian improved CRIT
+3.Control on minAC<maxAC
+4.Modfy arrows in input numeric
+5.Add legendas (Tooltip: https://jqueryui.com/themeroller/)
+6. https://jsuites.net/docs/v4/color-picker Per colore atkr
+-->
+</body>
+</html>
