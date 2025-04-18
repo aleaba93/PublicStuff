@@ -340,15 +340,15 @@
 		  margin: 0 auto;
 		}
 
-/* Riduco TUTTO il pannello delle tabelle all'80% e lo centro */
-#TABLES {
-  width: 80%;
-  margin: 0 auto;
-}
-/* Riduco TUTTO il pannello del grafico all'80% e lo centro */
+/* fai occupare TUTTO lo spazio ai pannelli e al chart */
+#mean-container,
+#summary-container,
+#table-container,
+#chartContainer,
+#TABLES,
 #GRAPHS {
-  width: 100%;      /* usa tutta la larghezza disponibile */
-  max-width: 1200px;/* oppure imposti un limite massimo */
+  width: 100% !important;
+  max-width: none;
   margin: 0 auto;
 }
 
@@ -949,14 +949,13 @@
 				<div id="summary-container" style="margin-bottom: 25px;"></div> <!-- Nuova tabella dei totali -->
 				<div id="table-container"></div> <!-- Questo è dove metteremo la tabella dettagliata -->
 			</div>
-			<div id="GRAPHS" class="tab-panel">
-				<div id="chartContainer"
-					 style="height: 600px;      /* alza pure l’altezza se vuoi */
-							width: 100%;        /* occupa tutta la larghezza del contenitore */
-							max-width: none;    /* rimuovi eventuali limiti */
-							background-color: #8c8c8c;">
-				</div>
-			</div>
+			<div id="GRAPHS"
+     class="tab-panel"
+     style="width:100%; max-width:none; margin:0 auto; padding:0;">
+  <div id="chartContainer"
+       style="height:600px; width:100%; background-color:#8c8c8c;">
+  </div>
+</div>
 		</div>
 	</div>
 	
