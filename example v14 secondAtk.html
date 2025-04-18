@@ -373,7 +373,6 @@
 		#chartContainer canvas {
 		  width: 100% !important;
 		  max-width: none !important;
-		  height: 100% !important;
 		}
 		
     </style>
@@ -1427,7 +1426,7 @@ window.onload = function() {
 			let secondAttackerLog = `
 				Second Attacker Variables:
 				Label 2: ${label2}
-				swing 2: ${swing2}
+				swing 2: ${swing2}	
 				Bonus Attack 2: ${bonusAttack2}
 				Num 2: ${d_num2}
 				Val 2: ${d_val2}
@@ -1614,6 +1613,7 @@ if (comparisonMode) {
     maxHitsA2 = swing2 + ((bonusAttack2 || f_PM2) ? 1 : 0);
 }
 
+
 // Usa la funzione computeHittingProbabilities per ottenere gli array necessari
 const { acArray, hitProb1, hitProb2 } = computeHittingProbabilities(df, maxHitsA1, maxHitsA2);
 
@@ -1758,9 +1758,12 @@ function createMeanTable(data) {
     const tbody = document.createElement("tbody");
     // Si assume che le variabili globali swing1 e bonusAttack1 (o f_PM1) siano definite per attacco1 e
     // analogamente swing2 e bonusAttack2 (o f_PM2) per attacco2.
-    const maxHitsA1 = swing1 + ((bonusAttack1 || f_PM1) ? 1 : 0);
-    const maxHitsA2 = (data[0].Damage2 !== undefined) ? (swing2 + ((bonusAttack2 || f_PM2) ? 1 : 0)) : null;
-    
+	// numero di tiri (hit-roll) PER TURNO
+	const attemptsPerTurnA1 = swing1 + (bonusAttack1 ? 1 : 0);
+	const attemptsPerTurnA2 = data[0].Damage2 !== undefined
+	  ? swing2 + (bonusAttack2 ? 1 : 0)
+	  : null;    
+	  
     Object.entries(meanSummary).forEach(([ac, values]) => {
         const tr = document.createElement("tr");
         // Colonna AC
@@ -1769,7 +1772,10 @@ function createMeanTable(data) {
         tr.appendChild(tdAC);
         // Calcola media e percentuale per Attacker 1
         const damageMean1 = (values.sumDamage1 / values.count).toFixed(1);
-        const hitPct1 = (((values.landedHits1 / values.count) / maxHitsA1) * 100).toFixed(2) + "%";
+        // TOTALE TENTATIVI per questo AC
+		const totalAttemptsA1 = values.count * attemptsPerTurnA1;
+		// hit% = hit effettive   ÷   hit-roll totali
+		const hitPct1 = ((values.landedHits1 / totalAttemptsA1) * 100).toFixed(2) + "%";
         const tdDam1 = document.createElement("td");
         tdDam1.textContent = damageMean1;
         tr.appendChild(tdDam1);
@@ -1778,16 +1784,13 @@ function createMeanTable(data) {
         tr.appendChild(tdHit1);
 
         // Se presente, calcola anche per Attacker 2
-        if (maxHitsA2 !== null) {
-            const damageMean2 = (values.sumDamage2 / values.count).toFixed(1);
-            const hitPct2 = (((values.landedHits2 / values.count) / maxHitsA2) * 100).toFixed(2) + "%";
-            const tdDam2 = document.createElement("td");
-            tdDam2.textContent = damageMean2;
-            tr.appendChild(tdDam2);
-            const tdHit2 = document.createElement("td");
-            tdHit2.textContent = hitPct2;
-            tr.appendChild(tdHit2);
-        }
+		if (attemptsPerTurnA2 !== null) {
+			const totalAttemptsA2 = values.count * attemptsPerTurnA2;
+			const tdHit2 = document.createElement("td");
+			tdHit2.textContent = ((values.landedHits2 / totalAttemptsA2) * 100).toFixed(2) + "%";
+			tr.appendChild(tdHit2);
+		}
+    
         tbody.appendChild(tr);
     });
     table.appendChild(tbody);
